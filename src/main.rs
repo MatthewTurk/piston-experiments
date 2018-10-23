@@ -11,7 +11,8 @@ use opengl_graphics::{ GlGraphics, OpenGL };
 
 pub struct App {
     gl: GlGraphics,
-    rotation: f64
+    rotation: f64,
+    rotation_speed: f64
 }
 
 impl App {
@@ -48,7 +49,7 @@ impl App {
 
     fn update(&mut self, args: &UpdateArgs) {
         // Update our rotation by 2 radians a second
-        self.rotation += 2.0 * args.dt;
+        self.rotation += self.rotation_speed * args.dt;
     }
 
 }
@@ -68,7 +69,8 @@ fn main() {
     // now make a new app and give it a new opengl
     let mut app = App {
         gl: GlGraphics::new(opengl),
-        rotation: 0.0
+        rotation: 0.0,
+        rotation_speed: 2.0
     };
 
     let mut events = Events::new(EventSettings::new());
@@ -82,6 +84,19 @@ fn main() {
         }
         if let Some(u) = e.update_args() {
             app.update(&u);
+        }
+        if let Some(Button::Keyboard(key)) = e.press_args() {
+            match key {
+                Key::A => {
+                        app.rotation_speed += 0.1;
+                        println!("Speeding up to {:?}", app.rotation_speed)
+                    },
+                Key::B => {
+                        app.rotation_speed -= 0.1;
+                        println!("Slowing down to {:?}", app.rotation_speed)
+                    },
+                _ => println!("You pressed {:?}\n", key)
+            }
         }
     }
 }
