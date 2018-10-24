@@ -7,7 +7,8 @@ use piston::window::WindowSettings;
 use piston::event_loop::*;
 use piston::input::*;
 use glutin_window::GlutinWindow as Window;
-use opengl_graphics::{ GlGraphics, OpenGL };
+use opengl_graphics::{ GlGraphics, OpenGL, Texture, TextureSettings };
+use std::path::Path;
 
 pub struct App {
     gl: GlGraphics,
@@ -22,10 +23,14 @@ impl App {
 
         const GREEN: [f32; 4] = [0.0, 1.0, 0.0, 1.0];
         const RED:   [f32; 4] = [1.0, 0.0, 0.0, 1.0];
+        const BLACK: [f32; 4] = [0.0, 0.0, 0.0, 1.0];
 
         // 0, 0, 50?
         // https://docs.rs/piston2d-graphics/0.21.1/graphics/rectangle/struct.Rectangle.html
         let square = rectangle::square(0.0, 0.0, 50.0);
+
+        let image_texture = Texture::from_path(Path::new("testing.jpg"), &TextureSettings::new()).unwrap();
+        let image = Image::new().rect(square);
 
         let rotation = self.rotation;
         let (x, y) = ((args.width / 2) as f64,
@@ -35,7 +40,7 @@ impl App {
         self.gl.draw(args.viewport(), |c, gl| {
             // Clear the screen to GREEN
             // I think "clear" comes from graphics here
-            clear(GREEN, gl);
+            clear(BLACK, gl);
 
             // this transform translates to the center, rotates, then moves by -25?
             let transform = c.transform.trans(x, y)
@@ -43,7 +48,8 @@ impl App {
                                        .trans(-25.0, -25.0);
 
             // Now draw from the rectangle object
-            rectangle(RED, square, transform, gl);
+            image.draw(&image_texture, &DrawState::default(), transform, gl);
+            //rectangle(RED, square, transform, gl);
         });
     }
 
