@@ -17,7 +17,7 @@ pub struct App {
 }
 
 impl App {
-    fn render(&mut self, args: &RenderArgs) {
+    fn render(&mut self, args: &RenderArgs, image_texture: &opengl_graphics::Texture) {
         // I didn't know we could do use's inside functions
         use graphics::*;
 
@@ -29,7 +29,6 @@ impl App {
         // https://docs.rs/piston2d-graphics/0.21.1/graphics/rectangle/struct.Rectangle.html
         let square = rectangle::square(0.0, 0.0, 50.0);
 
-        let image_texture = Texture::from_path(Path::new("testing.jpg"), &TextureSettings::new()).unwrap();
         let image = Image::new().rect(square);
 
         let rotation = self.rotation;
@@ -48,7 +47,7 @@ impl App {
                                        .trans(-25.0, -25.0);
 
             // Now draw from the rectangle object
-            image.draw(&image_texture, &DrawState::default(), transform, gl);
+            image.draw(image_texture, &DrawState::default(), transform, gl);
             //rectangle(RED, square, transform, gl);
         });
     }
@@ -79,6 +78,7 @@ fn main() {
         rotation_speed: 2.0
     };
 
+    let image_texture = Texture::from_path(Path::new("testing.jpg"), &TextureSettings::new()).unwrap();
     let mut events = Events::new(EventSettings::new());
     // We're embedding a "let" into the conditional of the while loop
     // https://doc.rust-lang.org/rust-by-example/flow_control/if_let.html
@@ -86,7 +86,7 @@ fn main() {
         // Not totally sure, but maybe this is called whenever a render needs to happen?  Or when
         // it *does* happend?
         if let Some(r) = e.render_args() {
-            app.render(&r);
+            app.render(&r, &image_texture);
         }
         if let Some(u) = e.update_args() {
             app.update(&u);
